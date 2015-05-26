@@ -30,6 +30,11 @@ import org.junit.Test;
 import org.wildfly.plugin.common.ServerOperations;
 import org.wildfly.plugin.tests.AbstractWildFlyServerMojoTest;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 public class ExecuteCommandsTest extends AbstractWildFlyServerMojoTest {
 
     @Test
@@ -94,5 +99,22 @@ public class ExecuteCommandsTest extends AbstractWildFlyServerMojoTest {
 
         // Clean up the property
         executeOperation(ServerOperations.createRemoveOperation(address));
+    }
+
+    @Test
+    public void testExecuteModule() throws Exception {
+
+        final Mojo executeCommandsMojo = lookupMojoAndVerify("execute-commands", "execute-add-module-pom.xml");
+
+        executeCommandsMojo.execute();
+
+//        // Read the attribute
+//        final ModelNode address = ServerOperations.createAddress("system-property", "org.wildfly.maven.plugin-batch");
+//        final ModelNode op = ServerOperations.createReadAttributeOperation(address, "value");
+//        final ModelNode result = executeOperation(op);
+//        assertEquals("true", ServerOperations.readResultAsString(result));
+//
+//        // Clean up the property
+//        executeOperation(ServerOperations.createRemoveOperation(address));
     }
 }
