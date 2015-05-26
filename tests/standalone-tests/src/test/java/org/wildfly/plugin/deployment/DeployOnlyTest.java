@@ -142,6 +142,18 @@ public class DeployOnlyTest extends AbstractWildFlyServerMojoTest {
         assertFalse("Deployment " + DEPLOYMENT_NAME + " was not undeployed", isDeployed(DEPLOYMENT_NAME));
     }
 
+    @Test
+    public void testDeployWithAddModule() throws Exception {
+
+        // Make sure the archive is not deployed
+        if (isDeployed(DEPLOYMENT_NAME)) {
+            undeploy(DEPLOYMENT_NAME);
+        }
+
+        final AbstractDeployment deployMojo = lookupMojoAndVerify("deploy-only", "deploy-only-webarchive-with-add-module-pom.xml");
+
+        deployMojo.execute();
+    }
 
     protected boolean isDeployed(final String name) throws IOException {
         //
