@@ -1,5 +1,11 @@
-The server failed to start: Command execution failed for command 'module add --name=testing --resources=empty.jar'. JBOSS_HOME environment variable is not set. -> [Help 1]
+## Problem
+Executing `module add` command with `mvn wildfly:run` causes an error:
 
+    The server failed to start:
+    Command execution failed for command 'module add --name=testing --resources=empty.jar'.
+    JBOSS_HOME environment variable is not set.
+
+Error call stack:
 
     org.apache.maven.lifecycle.LifecycleExecutionException: Failed to execute goal org.wildfly.plugins:wildfly-maven-plugin:1.1.0.Alpha3-SNAPSHOT:run (default-cli) on project testing: The server failed to start
         at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:216)
@@ -43,3 +49,32 @@ The server failed to start: Command execution failed for command 'module add --n
         at org.jboss.as.cli.impl.CommandContextImpl.handle(CommandContextImpl.java:674)
         at org.wildfly.plugin.cli.Commands.executeCommands(Commands.java:172)
         ... 26 more
+
+## Reproduce
+
+Minimal project to reproduce: https://github.com/rzymek/wildfly-maven-plugin/tree/add-module-reproduce
+
+    git clone https://github.com/rzymek/wildfly-maven-plugin.git -b add-module-reproduce add-module-reproduce
+    cd add-module-reproduce
+    mvn wildfly:run
+
+It generally boils down to calling `mvn wildfly:run` with:
+
+    <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+        <version>1.1.0.Alpha3-SNAPSHOT</version>
+        <configuration>
+            <before-deployment>
+                <commands>
+                    <command>
+                        module add --name=testing --resources=empty.jar
+                    </command>
+                </commands>
+            </before-deployment>
+        </configuration>
+    </plugin>
+
+## Fix
+
+As `wildfly:run` unpacks the server by itself, it knows what value should `JBOSS_HOME` have (and not the caller). That's why it can pass the value to `ASModuleHandler` via `jboss.home.dir` Java system property.
