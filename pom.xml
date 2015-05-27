@@ -22,6 +22,16 @@
                         </commands>
                     </before-deployment>
                 </configuration>
+                <dependencies>
+                    <!-- The dependency can be removed after
+                    https://github.com/wildfly/wildfly-maven-plugin/pull/43
+                    is merged -->
+                    <dependency>
+                        <groupId>org.jboss.logmanager</groupId>
+                        <artifactId>jboss-logmanager</artifactId>
+                        <version>1.5.4.Final</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
